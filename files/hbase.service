@@ -1,0 +1,13 @@
+[Unit]
+Description=Hbase
+
+[Service]
+Type=simple
+User=hbase
+Group=hbase
+Restart=on-failure
+WorkingDirectory=/opt/hbase/current
+ExecStart=/opt/hbase/current/bin/start-hbase.sh
+
+[Install]
+WantedBy=multi-user.target

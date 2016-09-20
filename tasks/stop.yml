@@ -1,0 +1,3 @@
+---
+- name: Stop Hbase
+  service: name=hbase state=stopped enabled=yes

@@ -1,0 +1,3 @@
+---
+- name: Enable and Start Hbase
+  service: name=hbase state=started enabled=yes

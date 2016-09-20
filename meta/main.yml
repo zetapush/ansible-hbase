@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Leonardo Bueno
+  description: Install hbase in standalone, local filesystem mode
+  company: Infobase
+
+  license: MIT
+
+  min_ansible_version: 1.7
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - xenial
+
+  galaxy_tags: ["hbase"]
+
+dependencies: []

@@ -1,0 +1,8 @@
+---
+- name: Find the closes apache mirror
+  shell: "curl 'https://www.apache.org/dyn/closer.cgi' |  grep -o '<strong>[^<]*</strong>' | sed 's/<[^>]*>//g' | head -1"
+  register: apache_mirror
+  changed_when: false
+
+- name: Fetch hbase package
+  get_url: dest={{ download_tmp_dir }}/{{hbase_tarball_name}} url="{{apache_mirror.stdout}}/hbase/{{hbase_version}}/{{hbase_tarball_name}}"

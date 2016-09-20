@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>{{ hbase_zk_nodes }}</value>
+    </property>
+
+    <property>
+        <name>hbase.zookeeper.property.dataDir</name>
+        <value>{{ hbase_zookeeper_data_dir }}</value>
+    </property>
+
+{% if hbase_install_type != 'local' %}
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+{% endif %}
+
+{% if hbase_use_hdfs  %}
+    <property>
+        <name>hbase.rootdir</name>
+        <value>{{ hbase_hdfs_url }}</value>
+    </property>
+{% else %}
+    <property>
+        <name>hbase.rootdir</name>
+        <value>{{ hbase_standalone_dir }}</value>
+    </property>
+{% endif %}
+
+</configuration>

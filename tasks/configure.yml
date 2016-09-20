@@ -1,0 +1,72 @@
+---
+- name: Setup group
+  group: name={{hbase_group}} system=yes
+
+- name: Setup user
+  user: name={{hbase_user}} system=yes group={{hbase_group}}
+
+- name: Create hbase root directory
+  file: path={{hbase_root_dir}} state=directory owner={{hbase_user}} group={{hbase_group}} mode=755
+
+- name: Uncompress the hbase tar
+  unarchive: copy=no creates="{{hbase_root_dir}}/{{hbase_tarball_name}}" dest="{{hbase_root_dir}}" src="{{ download_tmp_dir }}/{{ hbase_tarball_name }}" owner="{{ hbase_user }}" group="{{ hbase_group }}"
+
+- name: Link current version
+  file: path={{hbase_root_dir}}/current state=link src={{hbase_dir}} owner="{{ hbase_user }}" group="{{ hbase_group }}"
+
+- name: Create hbase log and local directories
+  file: path={{item}} state=directory owner={{hbase_user}} group={{hbase_group}} mode=775
+  with_items:
+    - "{{hbase_local_dir}}"
+    - "/var/log/hbase"
+
+- name: Check if hbase log directory already exists
+  stat: path={{hbase_dir}}/logs get_md5=False
+  register: hbase_logs_dir
+
+- name: Create hbase log symlink to /var/log/hbase if directory does not exist
+  file: path={{hbase_dir}}/logs state=link src=/var/log/hbase
+  when: not hbase_logs_dir.stat.exists
+
+- name: Change the owner due to bug in unarchive above
+  file: path="{{hbase_root_dir}}" owner="{{ hbase_user }}" group="{{ hbase_group }}" state=directory recurse=yes
+
+- name: Detect if this is a systemd based system
+  command: cat /proc/1/comm
+  register: init
+- set_fact: use_systemd=True
+  when: init.stdout == 'systemd'
+- set_fact: use_systemd=False
+  when: init.stdout != 'systemd'
+
+- name: Configure HBASE_MANAGES_ZK in conf/hbase-env.sh
+  lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export HBASE_MANAGES_ZK=" line="export HBASE_MANAGES_ZK={{ hbase_manages_zk }}"
+  notify:
+    - Restart Hbase
+
+- name: Configure JAVA_HOME in conf/hbase-env.sh
+  lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export JAVA_HOME=" line="export JAVA_HOME={{ lookup('env','JAVA_HOME') }}"
+  notify:
+    - Restart Hbase
+
+- name: Configure hbase-site.xml
+  template: dest="{{hbase_dir}}/conf/hbase-site.xml" owner={{hbase_user}} group={{hbase_group}} mode=644 src=hbase-site.xml.j2
+  notify:
+    - Restart Hbase
+
+- name: Setup hbase upstart script
+  copy: dest={{hbase_upstart_conf}} owner=root group=root mode=644 src=hbase.conf
+  notify:
+    - Restart Hbase
+  when: not use_systemd
+
+- name: Setup hbase systemd script
+  copy: dest={{hbase_systemd_service}} owner=root group=root mode=644 src=hbase.service
+  notify:
+    - Restart Hbase
+  when: use_systemd
+
+- command: systemctl daemon-reload
+  when: use_systemd
+
+- meta: flush_handlers

@@ -1,0 +1,5 @@
+---
+# TODO: restart hbase!
+- name: Restart Hbase
+  service: name=hbase state=restarted
+  when: hbase_enabled | bool and run_mode == 'Deploy'
