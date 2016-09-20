@@ -8,6 +8,8 @@ Group=hbase
 Restart=on-failure
 WorkingDirectory=/opt/hbase/current
 ExecStart=/opt/hbase/current/bin/start-hbase.sh
+ExecStop=/opt/hbase/current/bin/stop-hbase.sh
+PIDFile=/tmp/hbase-hbase-master.pid
 
 [Install]
 WantedBy=multi-user.target
