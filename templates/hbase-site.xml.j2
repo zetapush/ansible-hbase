@@ -29,4 +29,13 @@
     </property>
 {% endif %}
 
+    <property>
+        <name>zookeeper.znode.parent</name>
+        {% if hbase_unsecure  %}
+            <value>/hbase-unsecure</value>
+        {% else %}
+            <value>/hbase</value>
+        {% endif %}
+    </property>
+
 </configuration>

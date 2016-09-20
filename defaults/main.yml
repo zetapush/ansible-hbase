@@ -10,6 +10,7 @@ hbase_standalone_dir: "file:///home/hbase/hbase_data"
 hbase_hdfs_url: "hdfs://localhost:8020/hbase"
 hbase_manages_zk: true
 hbase_enabled: true
+hbase_unsecure: true
 hbase_zk_nodes: "localhost"
 hbase_zookeeper_port: 2181
 hbase_version: 1.2.3
