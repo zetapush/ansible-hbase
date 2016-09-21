@@ -12,6 +12,6 @@ galaxy_info:
     versions:
     - xenial
 
-  galaxy_tags: ["hbase"]
+  galaxy_tags: ["hbase", "database", "nosql", "development"]
 
 dependencies: []

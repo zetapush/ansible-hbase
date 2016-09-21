@@ -1,41 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property>
-        <name>hbase.zookeeper.quorum</name>
-        <value>{{ hbase_zk_nodes }}</value>
-    </property>
 
+{%
+    for key, value in hbase_combined_site_properties.iteritems()
+%}
     <property>
-        <name>hbase.zookeeper.property.dataDir</name>
-        <value>{{ hbase_zookeeper_data_dir }}</value>
+        <name>{{ key }}</name>
+        <value>{{ value }}</value>
     </property>
-
-{% if hbase_install_type != 'local' %}
-    <property>
-        <name>hbase.cluster.distributed</name>
-        <value>true</value>
-    </property>
-{% endif %}
-
-{% if hbase_use_hdfs  %}
-    <property>
-        <name>hbase.rootdir</name>
-        <value>{{ hbase_hdfs_url }}</value>
-    </property>
-{% else %}
-    <property>
-        <name>hbase.rootdir</name>
-        <value>{{ hbase_standalone_dir }}</value>
-    </property>
-{% endif %}
-
-    <property>
-        <name>zookeeper.znode.parent</name>
-        {% if hbase_unsecure  %}
-            <value>/hbase-unsecure</value>
-        {% else %}
-            <value>/hbase</value>
-        {% endif %}
-    </property>
+{% endfor %}
 
 </configuration>
+

@@ -6,3 +6,7 @@
 
 - name: Fetch hbase package
   get_url: dest={{ download_tmp_dir }}/{{hbase_tarball_name}} url="{{apache_mirror.stdout}}/hbase/{{hbase_version}}/{{hbase_tarball_name}}"
+
+- name: Fetch phoenix package
+  get_url: dest={{ download_tmp_dir }}/{{phoenix_tarball_name}} url="{{apache_mirror.stdout}}/phoenix/{{phoenix_name}}/bin/{{phoenix_tarball_name}}"
+  when: install_phoenix

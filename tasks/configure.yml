@@ -66,7 +66,31 @@
     - Restart Hbase
   when: use_systemd
 
-- command: systemctl daemon-reload
+- name: reload systemctl daemon
+  command: systemctl daemon-reload
   when: use_systemd
+
+- name: Unarchive phoenix
+  unarchive:
+    copy: no
+    creates: "{{download_tmp_dir}}/{{phoenix_name}}-bin"
+    dest: "{{download_tmp_dir}}"
+    src: "{{ download_tmp_dir }}/{{ phoenix_tarball_name }}"
+    owner: "{{ hbase_user }}"
+    group: "{{ hbase_group }}"
+  when: install_phoenix
+
+- name: Copy query server and phoenix server jar
+  copy:
+    dest: "{{hbase_root_dir}}/current/lib"
+    owner: "{{ hbase_user }}"
+    group: "{{ hbase_group }}"
+    mode: "u=rw,g=r,o=r"
+    remote_src: true
+    src: "{{download_tmp_dir}}/{{phoenix_name}}-bin/{{ item }}"
+  with_items: "{{phoenix_server_jars}}"
+  notify:
+    - Restart Hbase
+  when: install_phoenix
 
 - meta: flush_handlers
