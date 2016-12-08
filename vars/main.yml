@@ -1,6 +1,3 @@
 ---
-hbase_systemd_service: /etc/systemd/system/hbase.service
-hbase_upstart_conf: /etc/init/hbase.conf
-hbase_root_dir: /opt/hbase
 hbase_group: hbase
 hbase_user: hbase

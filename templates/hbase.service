@@ -6,9 +6,9 @@ Type=simple
 User=hbase
 Group=hbase
 Restart=on-failure
-WorkingDirectory=/opt/hbase/current
-ExecStart=/opt/hbase/current/bin/start-hbase.sh
-ExecStop=/opt/hbase/current/bin/stop-hbase.sh
+WorkingDirectory={{hbase_current_dir}}
+ExecStart={{hbase_current_dir}}/bin/start-hbase.sh
+ExecStop={{hbase_current_dir}}/bin/stop-hbase.sh
 PIDFile=/tmp/hbase-hbase-master.pid
 
 [Install]

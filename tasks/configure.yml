@@ -55,13 +55,13 @@
     - Restart Hbase
 
 - name: Setup hbase upstart script
-  copy: dest={{hbase_upstart_conf}} owner=root group=root mode=644 src=hbase.conf
+  template: dest={{hbase_upstart_conf}} owner=root group=root mode=644 src=hbase.conf
   notify:
     - Restart Hbase
   when: not use_systemd
 
 - name: Setup hbase systemd script
-  copy: dest={{hbase_systemd_service}} owner=root group=root mode=644 src=hbase.service
+  template: dest={{hbase_systemd_service}} owner=root group=root mode=644 src=hbase.service
   notify:
     - Restart Hbase
   when: use_systemd

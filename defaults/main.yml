@@ -46,3 +46,7 @@ hbase_default_site_properties:
   zookeeper.znode.parent: "{{ '/hbase-unsecure' if hbase_unsecure  else '/hbase' }}"
 hbase_site_properties: {}
 hbase_combined_site_properties: "{{hbase_default_site_properties|combine(hbase_site_properties)}}"
+hbase_systemd_service: /etc/systemd/system/hbase.service
+hbase_upstart_conf: /etc/init/hbase.conf
+hbase_root_dir: /opt/hbase
+hbase_current_dir: "{{hbase_root_dir}}/current"
