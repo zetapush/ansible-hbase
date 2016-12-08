@@ -12,7 +12,7 @@
   unarchive: copy=no creates="{{hbase_root_dir}}/{{hbase_tarball_name}}" dest="{{hbase_root_dir}}" src="{{ download_tmp_dir }}/{{ hbase_tarball_name }}" owner="{{ hbase_user }}" group="{{ hbase_group }}"
 
 - name: Link current version
-  file: path={{hbase_root_dir}}/current state=link src={{hbase_dir}} owner="{{ hbase_user }}" group="{{ hbase_group }}"
+  file: path={{hbase_current_dir}} state=link src={{hbase_dir}} owner="{{ hbase_user }}" group="{{ hbase_group }}"
 
 - name: Create hbase log and local directories
   file: path={{item}} state=directory owner={{hbase_user}} group={{hbase_group}} mode=775
@@ -41,11 +41,13 @@
 
 - name: Configure HBASE_MANAGES_ZK in conf/hbase-env.sh
   lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export HBASE_MANAGES_ZK=" line="export HBASE_MANAGES_ZK={{ hbase_manages_zk }}"
+  when: hbase_env_set_manages_zk
   notify:
     - Restart Hbase
 
 - name: Configure JAVA_HOME in conf/hbase-env.sh
   lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export JAVA_HOME=" line="export JAVA_HOME={{ lookup('env','JAVA_HOME') }}"
+  when: hbase_env_set_java_home
   notify:
     - Restart Hbase
 
@@ -82,7 +84,7 @@
 
 - name: Copy query server and phoenix server jar
   copy:
-    dest: "{{hbase_root_dir}}/current/lib"
+    dest: "{hbase_current_dir}/lib"
     owner: "{{ hbase_user }}"
     group: "{{ hbase_group }}"
     mode: "u=rw,g=r,o=r"
