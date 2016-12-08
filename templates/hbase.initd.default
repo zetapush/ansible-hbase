@@ -1,0 +1,1 @@
+JAVA_HOME={{REMOTE_JAVA_HOME or lookup('env','JAVA_HOME')}}

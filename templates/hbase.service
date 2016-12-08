@@ -3,8 +3,8 @@ Description=Hbase
 
 [Service]
 Type=simple
-User=hbase
-Group=hbase
+User={{hbase_user}}
+Group={{hbase_group}}
 Restart=on-failure
 WorkingDirectory={{hbase_current_dir}}
 ExecStart={{hbase_current_dir}}/bin/start-hbase.sh

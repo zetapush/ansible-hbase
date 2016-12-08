@@ -8,6 +8,9 @@
 - name: Create hbase root directory
   file: path={{hbase_root_dir}} state=directory owner={{hbase_user}} group={{hbase_group}} mode=755
 
+- name: Create hbase Zookeeper root directory
+  file: path={{hbase_zookeeper_data_dir}} state=directory owner={{hbase_user}} group={{hbase_group}} mode=755
+
 - name: Uncompress the hbase tar
   unarchive: copy=no creates="{{hbase_root_dir}}/{{hbase_tarball_name}}" dest="{{hbase_root_dir}}" src="{{ download_tmp_dir }}/{{ hbase_tarball_name }}" owner="{{ hbase_user }}" group="{{ hbase_group }}"
 
@@ -45,8 +48,14 @@
   notify:
     - Restart Hbase
 
+
+- name: Evaluate actual JAVA_HOME
+  shell: readlink -f `which java`
+  register: java_bin_path
+- set_fact: REMOTE_JAVA_HOME={{java_bin_path.stdout | replace('/jre/bin/java','')}}
+
 - name: Configure JAVA_HOME in conf/hbase-env.sh
-  lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export JAVA_HOME=" line="export JAVA_HOME={{ lookup('env','JAVA_HOME') }}"
+  lineinfile: dest="{{ hbase_dir }}/conf/hbase-env.sh" regexp="^export JAVA_HOME=" line="export JAVA_HOME={{ REMOTE_JAVA_HOME or lookup('env','JAVA_HOME') }}"
   when: hbase_env_set_java_home
   notify:
     - Restart Hbase
@@ -56,11 +65,32 @@
   notify:
     - Restart Hbase
 
+
 - name: Setup hbase upstart script
   template: dest={{hbase_upstart_conf}} owner=root group=root mode=644 src=hbase.conf
   notify:
     - Restart Hbase
-  when: not use_systemd
+  when: not use_systemd and use_upstart
+
+- name: Setup hbase upstart service
+  file: path=/etc/init.d/hbase state=link src={{hbase_upstart_conf}} owner=root group=root
+  notify:
+    - Restart Hbase
+  when: not use_systemd and use_upstart
+
+
+- name: Setup hbase init.d script
+  template: src="hbase.initd.service" dest="/etc/init.d/hbase" owner=root group=root mode=0755
+  notify:
+    - Restart Hbase
+  when: not use_systemd and use_initd
+
+- name: Setup hbase init.d default
+  template: src="hbase.initd.default" dest="/etc/default/hbase" owner=root group=root mode=644
+  notify:
+    - Restart Hbase
+  when: not use_systemd and use_initd
+
 
 - name: Setup hbase systemd script
   template: dest={{hbase_systemd_service}} owner=root group=root mode=644 src=hbase.service
